@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,7 +6,8 @@ import PackageDescription
 let package = Package(
     name: "Core",
     platforms: [
-        .iOS("18.0")
+        .iOS("18.0"),
+        .macOS("10.15")
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
@@ -27,16 +28,7 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "Entity",
-            swiftSettings: [
-                .enableUpcomingFeature("BareSlashRegexLiterals"),
-                .enableUpcomingFeature("ConciseMagicFile"),
-                .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("ForwardTrailingClosures"),
-                .enableUpcomingFeature("ImplicitOpenExistentials"),
-                .enableUpcomingFeature("StrictConcurrency"),
-                .unsafeFlags(["-enable-actor-data-race-checks"], .when(configuration: .debug)),
-            ]
+            name: "Entity"
         ),
         .target(
             name: "ProductAppFeature",
@@ -45,16 +37,7 @@ let package = Package(
                 "TaskFeature",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
-            path: "./Sources/Features/ProductAppFeature",
-            swiftSettings: [
-                .enableUpcomingFeature("BareSlashRegexLiterals"),
-                .enableUpcomingFeature("ConciseMagicFile"),
-                .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("ForwardTrailingClosures"),
-                .enableUpcomingFeature("ImplicitOpenExistentials"),
-                .enableUpcomingFeature("StrictConcurrency"),
-                .unsafeFlags(["-enable-actor-data-race-checks"], .when(configuration: .debug)),
-            ]
+            path: "./Sources/Features/ProductAppFeature"
         ),
         .target(
             name: "TaskFeature",
@@ -62,16 +45,7 @@ let package = Package(
                 "Entity",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
-            path: "./Sources/Features/TaskFeature",
-            swiftSettings: [
-                .enableUpcomingFeature("BareSlashRegexLiterals"),
-                .enableUpcomingFeature("ConciseMagicFile"),
-                .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("ForwardTrailingClosures"),
-                .enableUpcomingFeature("ImplicitOpenExistentials"),
-                .enableUpcomingFeature("StrictConcurrency"),
-                .unsafeFlags(["-enable-actor-data-race-checks"], .when(configuration: .debug)),
-            ]
+            path: "./Sources/Features/TaskFeature"
         ),
         .testTarget(
             name: "EntityTests",
