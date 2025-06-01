@@ -6,13 +6,13 @@
 //
 
 import SwiftUI
-import TaskFeature
+import ProductAppFeature
 
 @main
 struct TaskShinHakken_ProductApp: App {
     var body: some Scene {
         WindowGroup {
-            TaskView()
+            RootView()
         }
     }
 }

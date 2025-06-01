@@ -6,7 +6,8 @@ import PackageDescription
 let package = Package(
     name: "Core",
     platforms: [
-        .iOS("18.0")
+        .iOS("18.0"),
+        .macOS("10.15")
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
@@ -20,22 +21,30 @@ let package = Package(
             name: "TaskFeature",
             targets: ["TaskFeature"]),
     ],
+    dependencies: [
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.20.2"),
+    ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "Entity"),
+            name: "Entity"
+        ),
         .target(
             name: "ProductAppFeature",
             dependencies: [
                 "Entity",
-                "TaskFeature"
+                "TaskFeature",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
             path: "./Sources/Features/ProductAppFeature"
         ),
         .target(
             name: "TaskFeature",
-            dependencies: ["Entity"],
+            dependencies: [
+                "Entity",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ],
             path: "./Sources/Features/TaskFeature"
         ),
         .testTarget(

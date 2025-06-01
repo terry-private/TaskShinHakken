@@ -29,6 +29,81 @@
 
 - **対象バージョン**: Swift 6.0以降
 - **言語機能**: 最新の安全性機能（Strict Concurrency等）を積極的に活用
+- **Concurrency**: async/await、MainActor、Sendableを適切に使用
+
+### 2.3. Swift 6.0 Concurrency対応
+
+**Sendable準拠**: データ競合を防ぐため、型がアクター間で安全に共有可能であることを示す`Sendable`プロトコルに準拠します。
+
+```swift
+// ✅ 良い例：StateとActionがSendableであれば、Reducerは通常、暗黙的にSendableに準拠します。
+// 明示的な準拠は不要な場合が多いです。
+@Reducer
+public struct SimplerReducer {
+    @ObservableState
+    public struct State: Equatable, Sendable { /* ... */ }
+    public enum Action: Sendable { /* ... */ }
+    // bodyなど
+}
+
+// ⚠️ 注意：明示的なSendable準拠が必要なケース
+// - StateまたはActionがSendableに準拠していない場合
+// - 依存関係(Dependency)に非Sendableな型が含まれる場合
+// - 将来的な変更に備えて、明示的にSendableであることを保証したい場合
+@Reducer
+public struct ExplicitlySendableReducer: Sendable {
+    @ObservableState
+    public struct State: Equatable, Sendable { /* ... */ }
+    public enum Action: Sendable { /* ... */ }
+    // bodyなど
+}
+```
+
+**MainActor指定**: UI関連の処理は`MainActor`で実行されることを保証します。
+
+```swift
+// ✅ 良い例：MainActorが必須なカスタムクラスや、UIを操作する関数
+@MainActor
+class CustomUIUpdater {
+    func updateUI() { /* UI更新ロジック */ }
+}
+
+// ❌ 悪い例：ViewおよびAppプロトコル準拠型への冗長な@MainActor指定
+// Viewプロトコルに準拠する型は、そのbodyプロパティを含め、暗黙的にMainActorで実行されます。
+// 明示的な@MainActorは冗長であり、規約違反とします。
+@MainActor // 冗長なため削除
+public struct TaskView: View { ... }
+
+// Appプロトコルに準拠する型も同様に、暗黙的にMainActorで実行されます。
+@main
+@MainActor // 冗長なため削除
+struct TaskShinHakken_ProductApp: App { ... }
+```
+
+**並行処理の安全性**: データ競合を防ぐための原則
+
+```swift
+// ✅ 良い例：非同期処理でのactor境界の明確化
+case .loadTasks:
+    state.isLoading = true
+    return .run { send in // .runクロージャ内は非同期コンテキスト
+        do {
+            // taskService.fetchTasks() は actor隔離されているか、グローバルアクターで実行される想定
+            let tasks = try await dependencies.taskService.fetchTasks()
+            // send は MainActor で実行される必要がある場合がある
+            await send(.tasksLoaded(tasks))
+        } catch {
+            await send(.loadTasksFailed(error))
+        }
+    }
+
+// ✅ 良い例：Viewのbody外でUIを更新する必要がある場合など、MainActorでの実行を明示
+nonisolated func updateGlobalUIState() { // nonisolatedな関数からUIを更新する場合
+    MainActor.assumeIsolated { // MainActorコンテキストであることを表明
+        // グローバルなUI状態の更新
+    }
+}
+```
 
 ## 3. 命名規則
 
@@ -114,6 +189,34 @@ struct TaskFeatureState: Equatable {
     var selectedTask: TaskItem?
 }
 ```
+
+**Reducer**: モジュール名との衝突を回避するため、`Reducer`サフィックスを使用。`State`と`Action`が`Sendable`であれば、通常`Reducer`自体への明示的な`Sendable`準拠は不要です。
+
+```swift
+// ✅ 良い例（モジュール名: TaskFeature）
+// StateとActionがSendableなため、TaskReducerは暗黙的にSendable
+@Reducer
+public struct TaskReducer {
+    @ObservableState
+    public struct State: Equatable, Sendable { /* ... */ }
+    public enum Action: Sendable { /* ... */ }
+    // bodyなど
+}
+
+// ❌ 悪い例（モジュール名と同じ名前）
+// モジュール名「TaskFeature」と衝突
+@Reducer
+public struct TaskFeature { ... }
+
+// ⚠️ 注意：明示的なSendable準拠が必要な場合
+@Reducer
+public struct MyComplexReducer: Sendable { ... }
+```
+
+**命名衝突回避の原則**:
+- モジュール名（フォルダ名）とstruct/class名を同じにしない
+- Reducerには必ず`Reducer`サフィックスを付ける
+- モジュール内の主要な型には、機能を表す明確な名前を付ける
 
 ### 3.5. ブーリアン値
 
@@ -452,14 +555,14 @@ case .updateUI:
 
 ```swift
 struct TaskListView: View {
-    @Bindable var store: StoreOf<TaskFeature>
+    @Bindable var store: StoreOf<TaskReducer>
 
     var body: some View {
         NavigationStack {
             contentView
                 .navigationTitle("タスク一覧")
                 .onAppear {
-                    store.send(.view(.onAppear)) // ◀ MODIFIED (Actionの構造に合わせて)
+                    store.send(.view(.onAppear))
                 }
         }
     }
@@ -470,12 +573,12 @@ struct TaskListView: View {
     private var contentView: some View {
         if store.isLoading {
             ProgressView("読み込み中...")
-        } else if let errorMessage = store.error?.userFriendlyDescription { // エラー表示の例
+        } else if let errorMessage = store.error?.userFriendlyDescription {
             Text(errorMessage)
                 .foregroundColor(.red)
                 .padding()
             Button("再試行") {
-                store.send(.view(.onAppear)) // 再試行アクションの例
+                store.send(.view(.onAppear))
             }
         } else {
             taskList
@@ -580,7 +683,8 @@ enum TaskFeatureAction {
 ### 8.2. Stateのプロパティ
 
 ```swift
-struct TaskFeatureState: Equatable {
+@ObservableState
+struct TaskFeatureState: Equatable, Sendable {
     // データプロパティ
     var tasks: [TaskItem] = []
     var selectedTaskId: TaskItem.ID?
@@ -595,17 +699,19 @@ struct TaskFeatureState: Equatable {
     // 子フィーチャーの状態
     var taskDetail: TaskDetailFeature.State?
     
-    struct Destination: Reducer {
-        enum State {
+    @Reducer
+    struct Destination: Sendable {
+        @ObservableState
+        enum State: Sendable {
             case alert(AlertState<Action.Alert>)
             case taskDetail(TaskDetailFeature.State)
         }
         
-        enum Action {
+        enum Action: Sendable {
             case alert(Alert)
             case taskDetail(TaskDetailFeature.Action)
             
-            enum Alert {
+            enum Alert: Sendable {
                 case confirmDelete
                 case dismiss
             }
@@ -623,9 +729,12 @@ struct TaskFeatureState: Equatable {
 ### 8.3. Reducerの構造
 
 ```swift
-struct TaskFeature: Reducer {
-    struct State: Equatable { /* ... */ }
-    enum Action { /* ... */ }
+@Reducer
+struct TaskReducer { // StateとActionがSendableなら、通常Sendable準拠は不要
+    @ObservableState
+    struct State: Equatable, Sendable { /* ... */ }
+    
+    enum Action: Sendable { /* ... */ }
     
     @Dependency(\.taskService) var taskService
     @Dependency(\.uuid) var uuid
@@ -648,10 +757,12 @@ struct TaskFeature: Reducer {
         case .loadTasks:
             state.isLoading = true
             return .run { send in
-                let tasks = try await taskService.fetchTasks()
-                await send(.loadTasksResponse(.success(tasks)))
-            } catch: { error, send in
-                await send(.loadTasksResponse(.failure(error)))
+                do {
+                    let tasks = try await taskService.fetchTasks()
+                    await send(.loadTasksResponse(.success(tasks)))
+                } catch {
+                    await send(.loadTasksResponse(.failure(error)))
+                }
             }
             
         case let .loadTasksResponse(.success(tasks)):
