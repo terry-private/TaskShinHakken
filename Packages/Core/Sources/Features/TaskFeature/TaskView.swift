@@ -4,9 +4,9 @@ import ComposableArchitecture
 // MARK: - Task View
 
 public struct TaskView: View {
-    @Bindable public var store: StoreOf<TaskFeature>
+    @Bindable public var store: StoreOf<TaskReducer>
     
-    public init(store: StoreOf<TaskFeature>) {
+    public init(store: StoreOf<TaskReducer>) {
         self.store = store
     }
     
@@ -56,8 +56,8 @@ public struct TaskView: View {
 
 #Preview {
     TaskView(
-        store: Store(initialState: TaskFeature.State()) {
-            TaskFeature()
+        store: Store(initialState: TaskReducer.State()) {
+            TaskReducer()
         }
     )
 }

@@ -8,20 +8,20 @@ import TaskFeature
 public struct ProductAppFeature {
     @ObservableState
     public struct State: Equatable {
-        public var taskFeature = TaskFeature.State()
+        public var taskFeature = TaskReducer.State()
         
         public init() {}
     }
     
     public enum Action {
-        case taskFeature(TaskFeature.Action)
+        case taskFeature(TaskReducer.Action)
     }
     
     public init() {}
     
     public var body: some ReducerOf<Self> {
         Scope(state: \.taskFeature, action: \.taskFeature) {
-            TaskFeature()
+            TaskReducer()
         }
     }
 }

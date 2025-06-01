@@ -115,6 +115,27 @@ struct TaskFeatureState: Equatable {
 }
 ```
 
+**Reducer**: モジュール名との衝突を回避するため、`Reducer`サフィックスを使用
+
+```swift
+// ✅ 良い例（モジュール名: TaskFeature）
+@Reducer
+public struct TaskReducer {
+    // 実装
+}
+
+// ❌ 悪い例（モジュール名と同じ名前）
+@Reducer
+public struct TaskFeature {  // モジュール名「TaskFeature」と衝突
+    // 実装
+}
+```
+
+**命名衝突回避の原則**:
+- モジュール名（フォルダ名）とstruct/class名を同じにしない
+- Reducerには必ず`Reducer`サフィックスを付ける
+- モジュール内の主要な型には、機能を表す明確な名前を付ける
+
 ### 3.5. ブーリアン値
 
 `is...`, `has...`, `can...`, `should...`, `will...`, `did...`などの接頭辞を使用

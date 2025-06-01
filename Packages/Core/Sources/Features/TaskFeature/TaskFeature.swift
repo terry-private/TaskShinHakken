@@ -1,10 +1,10 @@
 import Foundation
 import ComposableArchitecture
 
-// MARK: - Task Feature
+// MARK: - Task Reducer
 
 @Reducer
-public struct TaskFeature {
+public struct TaskReducer {
     @ObservableState
     public struct State: Equatable {
         public var isLoading = false
