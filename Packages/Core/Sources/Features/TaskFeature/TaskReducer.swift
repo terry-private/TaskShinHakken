@@ -13,7 +13,7 @@ public struct TaskReducer {
         public init() {}
     }
     
-    public enum Action: Sendable {
+    public enum Action {
         case onAppear
         case taskCountIncremented
     }

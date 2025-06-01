@@ -12,7 +12,7 @@ import ProductAppFeature
 struct TaskShinHakken_ProductApp: App {
     var body: some Scene {
         WindowGroup {
-            TaskShinHakkenApp.createRootView()
+            RootView()
         }
     }
 }
