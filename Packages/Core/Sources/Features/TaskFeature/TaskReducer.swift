@@ -6,14 +6,14 @@ import ComposableArchitecture
 @Reducer
 public struct TaskReducer {
     @ObservableState
-    public struct State: Equatable {
+    public struct State: Equatable, Sendable {
         public var isLoading = false
         public var taskCount = 0
         
         public init() {}
     }
     
-    public enum Action {
+    public enum Action: Sendable {
         case onAppear
         case taskCountIncremented
     }

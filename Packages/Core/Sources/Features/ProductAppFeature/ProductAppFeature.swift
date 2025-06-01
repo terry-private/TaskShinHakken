@@ -13,7 +13,7 @@ public struct ProductAppFeature {
         public init() {}
     }
     
-    public enum Action {
+    public enum Action: Sendable {
         case taskFeature(TaskReducer.Action)
     }
     
@@ -48,6 +48,7 @@ public struct ProductAppRootView: View {
 // MARK: - Public API (TCAを隠蔽)
 
 public struct TaskShinHakkenApp {
+    @MainActor
     public static func createRootView() -> some View {
         ProductAppRootView(
             store: Store(initialState: ProductAppFeature.State()) {
@@ -56,5 +57,5 @@ public struct TaskShinHakkenApp {
         )
     }
     
-    private init() {} // インスタンス化を防ぐ
-}
+    private init() {}
+} 
