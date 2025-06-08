@@ -12,20 +12,23 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
+            name: "CoreClient",
+            targets: ["CoreClient"]),
+        .library(
             name: "Entity",
             targets: ["Entity"]),
-        .library(
-            name: "ProductAppFeature",
-            targets: ["ProductAppFeature"]),
-        .library(
-            name: "TaskFeature",
-            targets: ["TaskFeature"]),
         .library(
             name: "HomeFeature",
             targets: ["HomeFeature"]),
         .library(
+            name: "ProductAppFeature",
+            targets: ["ProductAppFeature"]),
+        .library(
             name: "SettingsFeature",
             targets: ["SettingsFeature"]),
+        .library(
+            name: "TaskFeature",
+            targets: ["TaskFeature"]),
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.20.2"),
@@ -34,26 +37,15 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
+            name: "CoreClient",
+            dependencies: [
+                "Entity",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ],
+            path: "./Sources/CoreClient"
+        ),
+        .target(
             name: "Entity"
-        ),
-        .target(
-            name: "ProductAppFeature",
-            dependencies: [
-                "Entity",
-                "TaskFeature",
-                "HomeFeature",
-                "SettingsFeature",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-            ],
-            path: "./Sources/Features/ProductAppFeature"
-        ),
-        .target(
-            name: "TaskFeature",
-            dependencies: [
-                "Entity",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-            ],
-            path: "./Sources/Features/TaskFeature"
         ),
         .target(
             name: "HomeFeature",
@@ -64,12 +56,32 @@ let package = Package(
             path: "./Sources/Features/HomeFeature"
         ),
         .target(
+            name: "ProductAppFeature",
+            dependencies: [
+                "Entity",
+                "TaskFeature",
+                "HomeFeature",
+                "SettingsFeature",
+                "CoreClient",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ],
+            path: "./Sources/Features/ProductAppFeature"
+        ),
+        .target(
             name: "SettingsFeature",
             dependencies: [
                 "Entity",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
             path: "./Sources/Features/SettingsFeature"
+        ),
+        .target(
+            name: "TaskFeature",
+            dependencies: [
+                "Entity",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ],
+            path: "./Sources/Features/TaskFeature"
         ),
         .testTarget(
             name: "EntityTests",

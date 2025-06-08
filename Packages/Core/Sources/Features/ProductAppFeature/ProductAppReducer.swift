@@ -1,68 +1,50 @@
-import SwiftUI
 import ComposableArchitecture
-import TaskFeature
+import CoreClient
+import Entity
 import HomeFeature
 import SettingsFeature
+import SwiftUI
+import TaskFeature
 
 @Reducer
-public struct ProductAppReducer {
-    @ObservableState
-    public enum Tab {
-        case home
-        case task
-        case settings
-
-        var name: String {
-            switch self {
-            case .home:
-                return "Home"
-            case .task:
-                return "Task"
-            case .settings:
-                return "Settings"
-            }
-        }
-    }
-
+public struct ProductAppReducer: Sendable {
     @ObservableState
     public struct State: Equatable {
-        public var selectedTab: Tab = .home
-        public var home: HomeReducer.State = .init()
-        public var settings: SettingsReducer.State = .init()
-        public var task: TaskReducer.State = .init()
-
+        var mainTab: MainTabReducer.State?
+        var loading: Bool = false
         public init() {}
     }
 
     public enum Action {
-        case tabSelected(Tab)
-        case home(HomeReducer.Action)
-        case task(TaskReducer.Action)
-        case settings(SettingsReducer.Action)
+        case mainTab(MainTabReducer.Action)
+        case login
+        case loginSuceeded(User.ID)
     }
+
+    @Dependency(\.loginClient) var loginClient
 
     public init() {}
 
     public var body: some ReducerOf<Self> {
-        Scope(state: \.home, action: \.home) {
-            HomeReducer()
-        }
-        Scope(state: \.task, action: \.task) {
-            TaskReducer()
-        }
-        Scope(state: \.settings, action: \.settings) {
-            SettingsReducer()
-        }
-
         Reduce { state, action in
             switch action {
-            case let .tabSelected(tab):
-                state.selectedTab = tab
+            case .login:
+                state.loading = true
+                return .run { send in
+                    if let userID = try? await loginClient.login() {
+                        await send(.loginSuceeded(userID))
+                    }
+                }
+            case let .loginSuceeded(userID):
+                state.mainTab = .init(userID: userID)
+                state.loading = false
                 return .none
-
-            case .home, .task, .settings:
+            case .mainTab:
                 return .none
             }
+        }
+        .ifLet(\.mainTab, action: \.mainTab) {
+            MainTabReducer()
         }
     }
 }

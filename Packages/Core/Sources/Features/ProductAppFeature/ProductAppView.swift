@@ -12,23 +12,17 @@ public struct ProductAppView: View {
     }
 
     public var body: some View {
-        bodyView
-    }
-
-    @ViewBuilder
-    private var bodyView: some View {
-        TabView(selection: $store.selectedTab.sending(\.tabSelected)) {
-            Tab(ProductAppReducer.Tab.home.name, systemImage: "house", value: .home) {
-                HomeView(store: store.scope(state: \.home, action: \.home))
-            }
-            Tab(ProductAppReducer.Tab.task.name, systemImage: "list.bullet", value: .task) {
-                TaskView(store: store.scope(state: \.task, action: \.task))
-            }
-            Tab(ProductAppReducer.Tab.settings.name, systemImage: "gear", value: .settings) {
-                SettingsView(store: store.scope(state: \.settings, action: \.settings))
+        if let store = store.scope(state: \.mainTab, action: \.mainTab) {
+            MainTabView(store: store)
+        } else {
+            if store.loading {
+                ProgressView()
+            } else {
+                Button("ログイン") {
+                    store.send(.login)
+                }
             }
         }
-        .tabViewStyle(.sidebarAdaptable)
     }
 }
 
