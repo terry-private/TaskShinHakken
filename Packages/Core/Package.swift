@@ -20,6 +20,12 @@ let package = Package(
         .library(
             name: "TaskFeature",
             targets: ["TaskFeature"]),
+        .library(
+            name: "HomeFeature",
+            targets: ["HomeFeature"]),
+        .library(
+            name: "SettingsFeature",
+            targets: ["SettingsFeature"]),
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.20.2"),
@@ -35,6 +41,8 @@ let package = Package(
             dependencies: [
                 "Entity",
                 "TaskFeature",
+                "HomeFeature",
+                "SettingsFeature",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
             path: "./Sources/Features/ProductAppFeature"
@@ -46,6 +54,22 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
             path: "./Sources/Features/TaskFeature"
+        ),
+        .target(
+            name: "HomeFeature",
+            dependencies: [
+                "Entity",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ],
+            path: "./Sources/Features/HomeFeature"
+        ),
+        .target(
+            name: "SettingsFeature",
+            dependencies: [
+                "Entity",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ],
+            path: "./Sources/Features/SettingsFeature"
         ),
         .testTarget(
             name: "EntityTests",
