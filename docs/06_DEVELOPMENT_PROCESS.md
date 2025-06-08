@@ -50,35 +50,23 @@ gitgraph
 
 ### 2.2. コミットメッセージ規約
 
-**Conventional Commits形式を採用:**
+コミットメッセージは、変更内容を明確かつ簡潔に伝えるための重要な情報です。
+本プロジェクトでは、GitHubのIssueと自動的に連携させるため、以下の規約を遵守してください。
 
-```
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-**タイプ一覧:**
-- `feat`: 新機能追加
-- `fix`: バグ修正
-- `docs`: ドキュメント変更
-- `style`: フォーマット変更（機能に影響なし）
-- `refactor`: リファクタリング
-- `test`: テスト追加・修正
-- `chore`: ビルドプロセス、ツール変更
+- **フォーマット**: プレフィックスとして **`#<Issue番号>`** を必ず含める。
+- **件名 (Subject)**: 50文字以内で、変更内容を要約して記述する。命令形で書くことが望ましい（例: `Add`, `Fix`, `Refactor`）。
+- **本文 (Body)**: 必要に応じて、変更の理由や背景、詳細な実装内容を記述する。
 
 **例:**
-```bash
-feat(task): タスク一覧表示機能を実装 (#123)
+```
+#4 画面仕様書を追加
 
-- TaskListView の SwiftUI 実装
-- TCA TaskFeature の State/Action/Reducer 定義
-- Firebase からのタスク取得機能
-- ユニットテスト追加
+Issue #4のタスク「主要画面の定義」の一環として、
+docs/08_SCREEN_SPECIFICATIONS.md を新規作成しました。
 
-Closes #123
+- 主要画面リストの定義
+- 画面遷移図の追加
+- 各画面の詳細仕様
 ```
 
 ### 2.3. タグ付け（バージョニング）
