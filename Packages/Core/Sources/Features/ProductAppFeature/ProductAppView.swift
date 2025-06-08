@@ -6,7 +6,6 @@ import TaskFeature
 
 public struct ProductAppView: View {
     @Bindable var store: StoreOf<ProductAppReducer>
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     public init(store: StoreOf<ProductAppReducer>) {
         self.store = store
@@ -30,38 +29,6 @@ public struct ProductAppView: View {
             }
         }
         .tabViewStyle(.sidebarAdaptable)
-        .onAppear(perform: onAppearAction)
-    }
-
-    @ViewBuilder
-    private var detailView: some View {
-        switch store.state.selectedTab {
-        case .home:
-            HomeView(
-                store: store.scope(
-                    state: \.home,
-                    action: \.home
-                )
-            )
-        case .task:
-            TaskView(
-                store: store.scope(
-                    state: \.task,
-                    action: \.task
-                )
-            )
-        case .settings:
-            SettingsView(
-                store: store.scope(
-                    state: \.settings,
-                    action: \.settings
-                )
-            )
-        }
-    }
-
-    private func onAppearAction() {
-        // Do nothing
     }
 }
 
