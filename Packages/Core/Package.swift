@@ -76,11 +76,12 @@ let package = Package(
         .target(
             name: "ProductAppFeature",
             dependencies: [
-                "Entity",
-                "TaskFeature",
-                "HomeFeature",
-                "SettingsFeature",
                 "CoreClient",
+                "Entity",
+                "AuthFeature",
+                "HomeFeature",
+                "TaskFeature",
+                "SettingsFeature",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
             path: "./Sources/Features/ProductAppFeature"

@@ -5,7 +5,7 @@ import Entity
 @Reducer
 public struct LoginReducer: Sendable {
     @ObservableState
-    public struct State: Equatable {
+    public struct State: Equatable, Sendable {
         var email: String = ""
         var password: String = ""
         var logining: Bool = false
@@ -31,8 +31,13 @@ public struct LoginReducer: Sendable {
                 return .none
             case .onTapLoginButton:
                 state.logining = true
+                guard let email = EMail(rawValue: state.email) else {
+                    state.logining = false
+                    return .none
+                }
+                let password = state.password
                 return .run { send in
-                    if let userID = try? await self.loginClient.login() {
+                    if let userID = try? await self.loginClient.login(email, password) {
                         await send(.loginSucceeded(userID))
                     }
                 }

@@ -1,3 +1,4 @@
+import AuthFeature
 import ComposableArchitecture
 import CoreClient
 import Entity
@@ -12,13 +13,14 @@ public struct ProductAppReducer: Sendable {
     public struct State: Equatable {
         var mainTab: MainTabReducer.State?
         var loading: Bool = false
+        @Presents var login: LoginReducer.State?
         public init() {}
     }
 
     public enum Action {
         case mainTab(MainTabReducer.Action)
-        case login
-        case loginSuceeded(User.ID)
+        case login(PresentationAction<LoginReducer.Action>)
+        case loginButtonTapped
     }
 
     @Dependency(\.loginClient) var loginClient
@@ -28,16 +30,14 @@ public struct ProductAppReducer: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .login:
-                state.loading = true
-                return .run { send in
-                    if let userID = try? await loginClient.login() {
-                        await send(.loginSuceeded(userID))
-                    }
-                }
-            case let .loginSuceeded(userID):
+            case .loginButtonTapped:
+                state.login = LoginReducer.State()
+                return .none
+            case .login(.presented(.loginSucceeded(let userID))):
+                state.login = nil
                 state.mainTab = .init(userID: userID)
-                state.loading = false
+                return .none
+            case .login:
                 return .none
             case .mainTab:
                 return .none
@@ -45,6 +45,9 @@ public struct ProductAppReducer: Sendable {
         }
         .ifLet(\.mainTab, action: \.mainTab) {
             MainTabReducer()
+        }
+        .ifLet(\.$login, action: \.login) {
+            LoginReducer()
         }
     }
 }

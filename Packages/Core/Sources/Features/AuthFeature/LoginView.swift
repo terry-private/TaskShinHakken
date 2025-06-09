@@ -27,7 +27,6 @@ public struct LoginView: View {
                 .padding(.trailing, 24)
 
                 loginButton
-                    .padding()
 
 
                 Text("or")
@@ -69,16 +68,19 @@ extension LoginView {
                 if store.logining {
                     ProgressView()
                 } else {
-                    Text("Login")
+                    Text("ログイン")
+                        .bold()
                         .foregroundColor(.white)
                 }
                 Spacer()
             }
+            .padding(13)
+            .background(.orange)
+            .cornerRadius(12)
         }
         .disabled(store.logining)
-        .padding()
-        .background(.orange)
-        .cornerRadius(12)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 12)
     }
 }
 
@@ -103,10 +105,10 @@ struct CustomTextfield: View {
 
     var body: some View {
         textField
-            .padding(16)
+            .padding(13)
             .overlay(
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke()
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(lineWidth: 0.5)
             )
             .padding(.horizontal, 24)
             .padding(.vertical, 12)
