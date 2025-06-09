@@ -17,6 +17,12 @@ let package = Package(
         .library(
             name: "Entity",
             targets: ["Entity"]),
+
+        // MARK: - Features
+
+        .library(
+            name: "AuthFeature",
+            targets: ["AuthFeature"]),
         .library(
             name: "HomeFeature",
             targets: ["HomeFeature"]),
@@ -46,6 +52,18 @@ let package = Package(
         ),
         .target(
             name: "Entity"
+        ),
+
+        // MARK: - Features
+
+        .target(
+            name: "AuthFeature",
+            dependencies: [
+                "CoreClient",
+                "Entity",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ],
+            path: "./Sources/Features/AuthFeature"
         ),
         .target(
             name: "HomeFeature",
