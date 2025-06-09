@@ -47,7 +47,11 @@ public struct ProductAppReducer: Sendable {
             MainTabReducer()
         }
         .ifLet(\.$login, action: \.login) {
-            LoginReducer()
+            withDependencies {
+                $0.loginClient = loginClient
+            } operation: {
+                LoginReducer()
+            }
         }
     }
 }

@@ -1,6 +1,14 @@
 import ComposableArchitecture
 import Entity
 
+public enum LoginError: Error {
+    case invalidEmail
+    case weakPassword
+    case wrongPassword
+    case userNotFound
+    case unexpected((any Error)?)
+}
+
 public struct LoginClient: Sendable {
     public var login: @Sendable (EMail, String) async throws -> User.ID
 
