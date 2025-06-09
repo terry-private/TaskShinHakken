@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>83230161026-fj3p83o9csdv4hae7dvk1ek78e58a2j0.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.83230161026-fj3p83o9csdv4hae7dvk1ek78e58a2j0</string>
+	<key>API_KEY</key>
+	<string>AIzaSyC0yPe8Zg2DI6ocdvi9TBR8vXTUtorMkg0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>83230161026</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>terry.TaskShinHakken-Product</string>
+	<key>PROJECT_ID</key>
+	<string>taskshinhakken</string>
+	<key>STORAGE_BUCKET</key>
+	<string>taskshinhakken.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:83230161026:ios:048d41b6cc2e214ae1dc9b</string>
+</dict>
+</plist>

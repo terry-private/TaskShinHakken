@@ -4,7 +4,8 @@
 //
 //  Created by Teruhito Wakae on 2025/05/31.
 //
-
+import CoreClient
+import CoreClientProduct
 import SwiftUI
 import ProductAppFeature
 
@@ -16,3 +17,12 @@ struct TaskShinHakken_ProductApp: App {
         }
     }
 }
+
+final class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+      LoginClient.configure()
+
+      return true
+    }
+  }

@@ -15,6 +15,10 @@ let package = Package(
             name: "CoreClient",
             targets: ["CoreClient"]),
         .library(
+            name: "CoreClientProduct",
+            targets: ["CoreClientProduct"]),
+
+        .library(
             name: "Entity",
             targets: ["Entity"]),
 
@@ -38,6 +42,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.20.2"),
+        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "11.14.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -47,9 +52,19 @@ let package = Package(
             dependencies: [
                 "Entity",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-            ],
-            path: "./Sources/CoreClient"
+            ]
         ),
+        .target(
+            name: "CoreClientProduct",
+            dependencies: [
+                "CoreClient",
+                "Entity",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
+            ]
+        ),
+
         .target(
             name: "Entity"
         ),
@@ -65,6 +80,7 @@ let package = Package(
             ],
             path: "./Sources/Features/AuthFeature"
         ),
+
         .target(
             name: "HomeFeature",
             dependencies: [
@@ -77,6 +93,7 @@ let package = Package(
             name: "ProductAppFeature",
             dependencies: [
                 "CoreClient",
+                "CoreClientProduct",
                 "Entity",
                 "AuthFeature",
                 "HomeFeature",
