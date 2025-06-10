@@ -44,6 +44,7 @@ public struct LoginView: View {
             }
             .padding()
         }
+        .alert($store.scope(state: \.errorAlert, action: \.errorAlert))
     }
 }
 

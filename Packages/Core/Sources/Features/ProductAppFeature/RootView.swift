@@ -1,6 +1,5 @@
 import SwiftUI
-import CoreClient
-import CoreClientProduct
+import AuthClient
 import ComposableArchitecture
 
 public struct RootView: View {
@@ -10,11 +9,7 @@ public struct RootView: View {
     public var body: some View {
         ProductAppView(
             store: Store(initialState: ProductAppReducer.State()) {
-                withDependencies {
-                    $0.loginClient = .product
-                } operation: {
-                    ProductAppReducer()
-                }
+                ProductAppReducer()
             }
         )
     }

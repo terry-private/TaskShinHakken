@@ -12,11 +12,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "CoreClient",
-            targets: ["CoreClient"]),
-        .library(
-            name: "CoreClientProduct",
-            targets: ["CoreClientProduct"]),
+            name: "AuthClient",
+            targets: ["AuthClient"]),
 
         .library(
             name: "Entity",
@@ -48,16 +45,8 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "CoreClient",
+            name: "AuthClient",
             dependencies: [
-                "Entity",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-            ]
-        ),
-        .target(
-            name: "CoreClientProduct",
-            dependencies: [
-                "CoreClient",
                 "Entity",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
@@ -74,7 +63,7 @@ let package = Package(
         .target(
             name: "AuthFeature",
             dependencies: [
-                "CoreClient",
+                "AuthClient",
                 "Entity",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
@@ -92,8 +81,6 @@ let package = Package(
         .target(
             name: "ProductAppFeature",
             dependencies: [
-                "CoreClient",
-                "CoreClientProduct",
                 "Entity",
                 "AuthFeature",
                 "HomeFeature",

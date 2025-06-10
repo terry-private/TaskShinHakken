@@ -1,6 +1,6 @@
 import AuthFeature
 import ComposableArchitecture
-import CoreClient
+import AuthClient
 import Entity
 import HomeFeature
 import SettingsFeature
@@ -22,8 +22,6 @@ public struct ProductAppReducer: Sendable {
         case login(PresentationAction<LoginReducer.Action>)
         case loginButtonTapped
     }
-
-    @Dependency(\.loginClient) var loginClient
 
     public init() {}
 
@@ -47,11 +45,7 @@ public struct ProductAppReducer: Sendable {
             MainTabReducer()
         }
         .ifLet(\.$login, action: \.login) {
-            withDependencies {
-                $0.loginClient = loginClient
-            } operation: {
-                LoginReducer()
-            }
+            LoginReducer()
         }
     }
 }
