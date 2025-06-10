@@ -39,6 +39,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.20.2"),
+        .package(url: "https://github.com/pointfreeco/swift-navigation", from: "2.3.1"),
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "11.14.0"),
     ],
     targets: [
