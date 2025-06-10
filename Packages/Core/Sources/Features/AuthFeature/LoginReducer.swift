@@ -47,6 +47,7 @@ public struct LoginReducer: Sendable {
                 let password = state.password
                 return .run { send in
                     do {
+                        try await Task.sleep(for: .seconds(2))
                         let userID = try await self.authClient.login(email, password)
                         await send(.loginSucceeded(userID))
                     } catch {
@@ -60,8 +61,8 @@ public struct LoginReducer: Sendable {
 
             case .showAlert(let error):
                 state.logining = false
-                if let loginError = error as? LoginError {
-                    switch loginError {
+                if let authError = error as? AuthError {
+                    switch authError {
                     case .invalidEmail:
                         state.errorAlert = AlertState(title: {
                             TextState("メールアドレスが間違っています。")

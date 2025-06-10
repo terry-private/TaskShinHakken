@@ -8,42 +8,70 @@ public struct LoginView: View {
     public init(store: StoreOf<LoginReducer>) {
         self.store = store
     }
+    enum CurrentFocus {
+        case email
+        case password
+    }
+    @FocusState private var currentFocus: CurrentFocus?
 
     public var body: some View {
         VStack {
-            VStack {
+            VStack(spacing: 35) {
                 header
-                    .padding(.bottom)
 
-                CustomTextfield(placeholder: "メールアドレス", text: $store.email)
-                CustomTextfield(placeholder: "パスワード",text: $store.password, isSecret: true)
-
-                HStack {
-                    Spacer()
-                    Button(action: {}) {
-                        Text("Forgot Password?")
+                VStack(spacing: 15) {
+                    TextField("Email", text: $store.email, prompt: Text("メールアドレス"))
+                        .keyboardType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                        .disableAutocorrection(true)
+                        .focused($currentFocus, equals: .email)
+                        .padding(13)
+                        .roundedBorder(.separator, width: 0.5, radius: 16)
+                    SecureField("Password", text: $store.password, prompt: Text("パスワード"))
+                        .focused($currentFocus, equals: .password)
+                        .padding(13)
+                        .roundedBorder(.separator, width: 0.5, radius: 16)
+                    HStack {
+                        Spacer()
+                        Button(action: {}) {
+                            Text("パスワードをお忘れの方")
+                                .font(.caption)
+                        }
                     }
                 }
-                .padding(.trailing, 24)
 
-                loginButton
+                Button {
+                    store.send(.onTapLoginButton)
+                } label: {
+                    if store.logining {
+                        ProgressView()
+                    } else {
+                        Text("ログイン")
+                    }
+                }
+                .buttonStyle(.primary)
 
 
-                Text("or")
-                    .padding()
+                Text("または")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
 
-                Button("Google Login!!") {
+                Button("Google Login") {
                     // Call Google Login Logic
                 }
             }
+            .padding(.horizontal, 24)
             .padding(.top, 52)
+
             Spacer()
 
             Button("新規アカウント作成") {
 
             }
             .padding()
+
         }
+        .disabled(store.logining)
         .alert($store.scope(state: \.errorAlert, action: \.errorAlert))
     }
 }
@@ -60,61 +88,63 @@ extension LoginView {
                 .multilineTextAlignment(.center)
         }
     }
-    var loginButton: some View {
-        Button {
-            store.send(.onTapLoginButton)
-        } label: {
-            HStack {
-                Spacer()
-                if store.logining {
-                    ProgressView()
-                } else {
-                    Text("ログイン")
-                        .bold()
-                        .foregroundColor(.white)
-                }
-                Spacer()
+}
+
+struct PrimaryButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) var isEnabled: Bool
+
+    func makeBody(configuration: Self.Configuration) -> some View {
+        HStack {
+            Spacer()
+            configuration.label
+            Spacer()
+        }
+            .bold()
+            .foregroundColor(isEnabled ? .white : Color(.placeholderText))
+            .padding(13)
+            .background(isEnabled ? .orange : Color(.secondarySystemFill))
+            .opacity(configuration.isPressed ? 0.2 : 1.0) // タップしている間は色を薄く
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .hoverEffect()
+    }
+}
+
+extension ButtonStyle where Self == PrimaryButtonStyle {
+    static var primary: PrimaryButtonStyle {
+        .init()
+    }
+}
+
+struct RoundedBorderModifier<Style: ShapeStyle>: ViewModifier {
+    var style: Style, width: CGFloat = 0, radius: CGFloat
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                RoundedRectangle(cornerRadius: radius)
+                    .stroke(lineWidth: width*2)
+                    .fill(style)
             }
-            .padding(13)
-            .background(.orange)
-            .cornerRadius(12)
-        }
-        .disabled(store.logining)
-        .padding(.horizontal, 24)
-        .padding(.vertical, 12)
+            .mask {
+                RoundedRectangle(cornerRadius: radius)
+            }
+    }
+}
+extension View {
+    func roundedBorder<S: ShapeStyle>(
+        _ style: S,
+        width: CGFloat,
+        radius: CGFloat
+    ) -> some View {
+        let modifier = RoundedBorderModifier(
+            style: style,
+            width: width,
+            radius: radius
+        )
+        return self.modifier(modifier)
     }
 }
 
-struct CustomTextfield: View {
-    @Binding var text: String
-    var placeholder: String
-    var isSecret: Bool
-    init(placeholder: String = "", text: Binding<String>, isSecret: Bool = false) {
-        self.placeholder = placeholder
-        self._text = text
-        self.isSecret = isSecret
-    }
-
-    @ViewBuilder
-    var textField: some View {
-        if isSecret {
-            SecureField(placeholder, text: $text)
-        } else {
-            TextField(placeholder, text: $text)
-        }
-    }
-
-    var body: some View {
-        textField
-            .padding(13)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(lineWidth: 0.5)
-            )
-            .padding(.horizontal, 24)
-            .padding(.vertical, 12)
-    }
-}
 #Preview {
     LoginView(
         store: .init(
