@@ -35,6 +35,10 @@ public struct ProductAppReducer: Sendable {
                 state.login = nil
                 state.mainTab = .init(userID: userID)
                 return .none
+            case .login(.presented(.signUp(.presented(.signUpSucceeded(let userID))))):
+                state.login = nil
+                state.mainTab = .init(userID: userID)
+                return .none
             case .login:
                 return .none
             case .mainTab:

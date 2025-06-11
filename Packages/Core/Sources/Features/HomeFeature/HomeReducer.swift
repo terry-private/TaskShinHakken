@@ -16,4 +16,4 @@ public struct HomeReducer {
             .none
         }
     }
-} 
+}

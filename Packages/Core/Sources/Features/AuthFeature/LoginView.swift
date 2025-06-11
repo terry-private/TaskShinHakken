@@ -66,13 +66,16 @@ public struct LoginView: View {
             Spacer()
 
             Button("新規アカウント作成") {
-
+                store.send(.onTapSignUpButton)
             }
             .padding()
 
         }
         .disabled(store.logining)
         .alert($store.scope(state: \.errorAlert, action: \.errorAlert))
+        .sheet(item: $store.scope(state: \.signUp, action: \.signUp)) { store in
+            SignUpView(store: store)
+        }
     }
 }
 

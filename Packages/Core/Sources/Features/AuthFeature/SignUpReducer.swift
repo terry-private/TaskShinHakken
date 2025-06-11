@@ -3,14 +3,13 @@ import AuthClient
 import Entity
 
 @Reducer
-public struct LoginReducer: Sendable {
+public struct SignUpReducer: Sendable {
     @ObservableState
     public struct State: Equatable, Sendable {
         var email: String = ""
         var password: String = ""
-        var logining: Bool = false
+        var signingUp: Bool = false
         @Presents var errorAlert: AlertState<Action.ErrorAlertAction>?
-        @Presents var signUp: SignUpReducer.State?
 
         public init() {}
     }
@@ -20,12 +19,10 @@ public struct LoginReducer: Sendable {
             case ok
         }
         case binding(BindingAction<State>)
-        case onTapLoginButton
-        case loginSucceeded(User.ID)
+        case onTapSignUpButton
+        case signUpSucceeded(User.ID)
         case showAlert(any Error)
         case errorAlert(PresentationAction<ErrorAlertAction>)
-        case onTapSignUpButton
-        case signUp(PresentationAction<SignUpReducer.Action>)
     }
 
     @Dependency(\.authClient) var authClient
@@ -38,10 +35,10 @@ public struct LoginReducer: Sendable {
             switch action {
             case .binding:
                 return .none
-            case .onTapLoginButton:
-                state.logining = true
+            case .onTapSignUpButton:
+                state.signingUp = true
                 guard let email = EMail(rawValue: state.email) else {
-                    state.logining = false
+                    state.signingUp = false
                     state.errorAlert = AlertState {
                         TextState("メールアドレスが間違っています。")
                     }
@@ -51,19 +48,19 @@ public struct LoginReducer: Sendable {
                 return .run { send in
                     do {
                         try await Task.sleep(for: .seconds(2))
-                        let userID = try await self.authClient.login(email, password)
-                        await send(.loginSucceeded(userID))
+                        let userID = try await self.authClient.signUp(email, password)
+                        await send(.signUpSucceeded(userID))
                     } catch {
                         await send(.showAlert(error))
                     }
                 }
 
-            case .loginSucceeded:
-                state.logining = false
+            case .signUpSucceeded:
+                state.signingUp = false
                 return .none
 
             case .showAlert(let error):
-                state.logining = false
+                state.signingUp = false
                 if let authError = error as? AuthError {
                     switch authError {
                     case .invalidEmail:
@@ -72,12 +69,12 @@ public struct LoginReducer: Sendable {
                         })
                     default:
                         state.errorAlert = AlertState(title: {
-                            TextState("ログインに失敗しました")
+                            TextState("アカウント作成に失敗しました")
                         })
                     }
                 } else {
                     state.errorAlert = AlertState(title: {
-                        TextState("ログインに失敗しました")
+                        TextState("アカウント作成に失敗しました")
                     })
                 }
 
@@ -85,17 +82,8 @@ public struct LoginReducer: Sendable {
             case .errorAlert:
                 state.errorAlert = nil
                 return .none
-
-            case .onTapSignUpButton:
-                state.signUp = SignUpReducer.State()
-                return .none
-            case .signUp:
-                return .none
             }
         }
         .ifLet(\.errorAlert, action: \.errorAlert)
-        .ifLet(\.$signUp, action: \.signUp) {
-            SignUpReducer()
-        }
     }
 }

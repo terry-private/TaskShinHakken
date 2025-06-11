@@ -8,29 +8,50 @@ public struct AuthClient: Sendable {
         FirebaseApp.configure()
     }
     public var login: @Sendable (EMail, String) async throws -> Entity.User.ID
+    public var signUp: @Sendable (EMail, String) async throws -> Entity.User.ID
 
-    public init(login: @escaping @Sendable (EMail, String) async throws -> Entity.User.ID) {
+    public init(
+        login: @escaping @Sendable (EMail, String) async throws -> Entity.User.ID,
+        signUp: @escaping @Sendable (EMail, String) async throws -> Entity.User.ID
+    ) {
         self.login = login
+        self.signUp = signUp
     }
 }
 
 extension AuthClient: DependencyKey {
     public static var liveValue: AuthClient {
-        AuthClient { email, password in
-            do {
-                let user = try await Auth.auth().signIn(withEmail: email.rawValue, password: password)
-                return Entity.User.ID(rawValue: user.user.uid)
-            } catch {
-                throw AuthError(from: error)
+        AuthClient(
+            login: { email, password in
+                do {
+                    let user = try await Auth.auth().signIn(withEmail: email.rawValue, password: password)
+                    return Entity.User.ID(rawValue: user.user.uid)
+                } catch {
+                    throw AuthError(from: error)
+                }
+            },
+            signUp: { email, password in
+                do {
+                    let user = try await Auth.auth().createUser(withEmail: email.rawValue, password: password)
+                    return Entity.User.ID(rawValue: user.user.uid)
+                } catch {
+                    throw AuthError(from: error)
+                }
             }
-        }
+        )
     }
 
     public static var previewValue: AuthClient {
-        AuthClient { _, _ in
-            try await Task.sleep(for: .seconds(1))
-            return "user-id"
-        }
+        AuthClient(
+            login: { _, _ in
+                try await Task.sleep(for: .seconds(1))
+                return "user-id"
+            },
+            signUp: { _, _ in
+                try await Task.sleep(for: .seconds(1))
+                return "user-id"
+            }
+        )
     }
 }
 
