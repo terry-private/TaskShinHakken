@@ -1,5 +1,7 @@
 import FirebaseAuth
 
+/// FirebaseAuthで発生するエラーのラッパー
+/// https://firebase.google.com/docs/auth/ios/errors?hl=ja
 public enum AuthError: Error {
     case invalidEmail
     case weakPassword

@@ -21,13 +21,21 @@ public struct ProductAppReducer: Sendable {
         case mainTab(MainTabReducer.Action)
         case login(PresentationAction<LoginReducer.Action>)
         case loginButtonTapped
+        case autoLogin
     }
+
+    @Dependency(\.authClient) var authClient
 
     public init() {}
 
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+            case .autoLogin:
+                if let userID = authClient.autoLogin() {
+                    state.mainTab = .init(userID: userID)
+                }
+                return .none
             case .loginButtonTapped:
                 state.login = LoginReducer.State()
                 return .none
