@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import Entity
 import SwiftUI
+import UIComponents
 
 public struct SignUpView: View {
     @Bindable var store: StoreOf<SignUpReducer>
@@ -23,7 +24,6 @@ public struct SignUpView: View {
                     TextField("Email", text: $store.email, prompt: Text("メールアドレス"))
                         .keyboardType(.emailAddress)
                         .textInputAutocapitalization(.never)
-                        .disableAutocorrection(true)
                         .focused($currentFocus, equals: .email)
                         .padding(13)
                         .roundedBorder(.separator, width: 0.5, radius: 16)

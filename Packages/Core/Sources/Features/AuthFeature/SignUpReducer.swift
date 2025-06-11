@@ -47,7 +47,6 @@ public struct SignUpReducer: Sendable {
                 let password = state.password
                 return .run { send in
                     do {
-                        try await Task.sleep(for: .seconds(2))
                         let userID = try await self.authClient.signUp(email, password)
                         await send(.signUpSucceeded(userID))
                     } catch {

@@ -50,7 +50,6 @@ public struct LoginReducer: Sendable {
                 let password = state.password
                 return .run { send in
                     do {
-                        try await Task.sleep(for: .seconds(2))
                         let userID = try await self.authClient.login(email, password)
                         await send(.loginSucceeded(userID))
                     } catch {

@@ -19,6 +19,10 @@ let package = Package(
             name: "Entity",
             targets: ["Entity"]),
 
+        .library(
+            name: "UIComponents",
+            targets: ["UIComponents"]),
+
         // MARK: - Features
 
         .library(
@@ -59,6 +63,10 @@ let package = Package(
             name: "Entity"
         ),
 
+        .target(
+            name: "UIComponents"
+        ),
+
         // MARK: - Features
 
         .target(
@@ -66,6 +74,7 @@ let package = Package(
             dependencies: [
                 "AuthClient",
                 "Entity",
+                "UIComponents",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
             path: "./Sources/Features/AuthFeature"
@@ -75,6 +84,7 @@ let package = Package(
             name: "HomeFeature",
             dependencies: [
                 "Entity",
+                "UIComponents",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
             path: "./Sources/Features/HomeFeature"
@@ -87,6 +97,7 @@ let package = Package(
                 "HomeFeature",
                 "TaskFeature",
                 "SettingsFeature",
+                "UIComponents",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
             path: "./Sources/Features/ProductAppFeature"
@@ -95,6 +106,7 @@ let package = Package(
             name: "SettingsFeature",
             dependencies: [
                 "Entity",
+                "UIComponents",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
             path: "./Sources/Features/SettingsFeature"
@@ -103,6 +115,7 @@ let package = Package(
             name: "TaskFeature",
             dependencies: [
                 "Entity",
+                "UIComponents",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
             path: "./Sources/Features/TaskFeature"
