@@ -10,15 +10,18 @@ public struct AuthClient: Sendable {
     public var autoLogin: @Sendable () -> Entity.User.ID?
     public var login: @Sendable (EMail, String) async throws -> Entity.User.ID
     public var signUp: @Sendable (EMail, String) async throws -> Entity.User.ID
+    public var signOut: @Sendable () throws -> Void
 
     public init(
         autoLogin: @escaping @Sendable () -> Entity.User.ID?,
         login: @escaping @Sendable (EMail, String) async throws -> Entity.User.ID,
-        signUp: @escaping @Sendable (EMail, String) async throws -> Entity.User.ID
+        signUp: @escaping @Sendable (EMail, String) async throws -> Entity.User.ID,
+        signOut: @escaping @Sendable () throws -> Void
     ) {
         self.autoLogin = autoLogin
         self.login = login
         self.signUp = signUp
+        self.signOut = signOut
     }
 }
 
@@ -46,6 +49,13 @@ extension AuthClient: DependencyKey {
                 } catch {
                     throw AuthError(from: error)
                 }
+            },
+            signOut: {
+                do {
+                    try Auth.auth().signOut()
+                } catch {
+                    throw AuthError(from: error)
+                }
             }
         )
     }
@@ -62,6 +72,9 @@ extension AuthClient: DependencyKey {
             signUp: { _, _ in
                 try await Task.sleep(for: .seconds(1))
                 return "user-id"
+            },
+            signOut: {
+                // Do nothing
             }
         )
     }

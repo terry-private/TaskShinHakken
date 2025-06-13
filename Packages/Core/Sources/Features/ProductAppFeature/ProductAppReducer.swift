@@ -49,6 +49,9 @@ public struct ProductAppReducer: Sendable {
                 return .none
             case .login:
                 return .none
+            case .mainTab(.settings(.logout)):
+                state.mainTab = nil
+                return .none
             case .mainTab:
                 return .none
             }

@@ -33,7 +33,7 @@ public struct SignUpView: View {
                         .roundedBorder(.separator, width: 0.5, radius: 16)
                 }
 
-                Button {
+                LargeButton {
                     store.send(.onTapSignUpButton)
                 } label: {
                     if store.signingUp {
@@ -42,7 +42,6 @@ public struct SignUpView: View {
                         Text("アカウント作成")
                     }
                 }
-                .buttonStyle(.primary)
             }
             .padding(.horizontal, 24)
             .padding(.top, 52)

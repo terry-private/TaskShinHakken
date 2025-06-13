@@ -6,8 +6,7 @@ import PackageDescription
 let package = Package(
     name: "Core",
     platforms: [
-        .iOS("18.0"),
-        .macOS("10.15")
+        .iOS("26.0"),
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
@@ -105,6 +104,7 @@ let package = Package(
         .target(
             name: "SettingsFeature",
             dependencies: [
+                "AuthClient",
                 "Entity",
                 "UIComponents",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),

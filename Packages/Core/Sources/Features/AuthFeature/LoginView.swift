@@ -41,7 +41,7 @@ public struct LoginView: View {
                     }
                 }
 
-                Button {
+                LargeButton {
                     store.send(.onTapLoginButton)
                 } label: {
                     if store.logining {
@@ -50,7 +50,6 @@ public struct LoginView: View {
                         Text("ログイン")
                     }
                 }
-                .buttonStyle(.primary)
 
 
                 Text("または")

@@ -64,7 +64,6 @@ public struct MainTabReducer {
             case let .tabSelected(tab):
                 state.selectedTab = tab
                 return .none
-
             case .home, .task, .settings:
                 return .none
             }
