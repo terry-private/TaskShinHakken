@@ -1,5 +1,6 @@
 import SwiftUI
 import ComposableArchitecture
+import UIComponents
 
 // MARK: - Task View
 
@@ -34,15 +35,12 @@ public struct TaskView: View {
                         .foregroundColor(.blue)
                 }
 
-                Button("タスクを完了") {
+                LargeButton("タスクを完了") {
                     store.send(.taskCountIncremented)
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
             }
             .padding()
-            .background(Color(.systemGray6))
-            .cornerRadius(12)
+            .glassEffect(in: .rect(cornerRadius: 10))
             .padding(.horizontal)
 
             Spacer()

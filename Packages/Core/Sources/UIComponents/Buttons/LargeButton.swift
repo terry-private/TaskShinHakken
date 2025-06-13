@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct LargeButton<Label: View>: View {
+    @Environment(\.isEnabled) var isEnabled: Bool
     var action: @MainActor () -> Void
     var label: Label
     var role: AppButtonStyle.Role
@@ -14,9 +15,13 @@ public struct LargeButton<Label: View>: View {
     public var body: some View {
         Button(action: action) {
             label
+                .bold()
+                .foregroundColor(isEnabled ? role.foregroundColor : .secondary)
+                .padding(.vertical, 12)
+                .padding(.horizontal, 16)
                 .frame(maxWidth: 300)
+                .glassEffect(role.glass, isEnabled: isEnabled)
         }
-        .buttonStyle(.app(role))
     }
 }
 
@@ -35,7 +40,18 @@ extension LargeButton where Label == Text {
         Text("count: \(count)")
             .monospacedDigit()
 
-        LargeButton("Large Button count up!!") {
+        LargeButton("primary count up!!") {
+            count += 1
+        }
+        .disabled(disabled)
+
+        LargeButton("secondary count up!!", role: .secondary) {
+            count += 1
+        }
+        .disabled(disabled)
+
+
+        LargeButton("destructive count up!!", role: .destructive) {
             count += 1
         }
         .disabled(disabled)

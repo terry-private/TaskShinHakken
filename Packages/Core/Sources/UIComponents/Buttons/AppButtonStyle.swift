@@ -74,8 +74,10 @@ public extension ButtonStyle where Self == AppButtonStyle {
         .disabled(disabled)
 
 
-        Button("destructive count up!! ") {
+        Button {
             count += 1
+        } label: {
+            Text("destructive count up!! ")
         }
         .buttonStyle(.app(.destructive))
         .disabled(disabled)
@@ -86,9 +88,8 @@ public extension ButtonStyle where Self == AppButtonStyle {
             disabled.toggle()
         } label: {
             Label("toggle", systemImage: disabled ? "lightswitch.off" : "lightswitch.on")
-                .padding()
         }
-        .buttonStyle(.glass)
+        .buttonStyle(GlassButtonStyle())
     }
     .padding()
 }
