@@ -16,12 +16,22 @@ public struct EMail: Hashable, Codable, Sendable, RawRepresentable {
     /// - Parameter email: チェックする文字列
     /// - Returns: 有効な場合はtrue、そうでない場合はfalse
     internal static func isValid(email: String) -> Bool {
-        // WHATWG HTML Living Standardで推奨されている正規表現
-        // https://html.spec.whatwg.org/multipage/input.html#e-mail-state-(type=email)
         let emailRegEx = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
-
         let emailPred = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
-        return emailPred.evaluate(with: email)
+        guard emailPred.evaluate(with: email) else { return false }
+        // 追加バリデーション
+        let parts = email.split(separator: "@", omittingEmptySubsequences: false)
+        guard parts.count == 2 else { return false }
+        let local = parts[0]
+        // ローカル部の先頭・末尾がドットでないか
+        if local.hasPrefix(".") || local.hasSuffix(".") { return false }
+        // ローカル部に連続ドットが含まれていないか
+        if local.contains("..") { return false }
+        // 全角文字が含まれていないか(Unicodeスカラー値が0xFF01~0xFF5E)
+        if email.unicodeScalars.contains(where: { $0.value >= 0xFF01 && $0.value <= 0xFF5E }) {
+            return false
+        }
+        return true
     }
 }
 
@@ -46,3 +56,4 @@ public extension EMail {
         return rawValue.components(separatedBy: "@")[1]
     }
 }
+
