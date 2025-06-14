@@ -17,35 +17,35 @@ public struct SignUpView: View {
 
     public var body: some View {
         VStack {
-            VStack(spacing: 35) {
-                header
+            ScrollView {
+                VStack(spacing: 35) {
+                    header
 
-                VStack(spacing: 15) {
-                    TextField("Email", text: $store.email, prompt: Text("メールアドレス"))
-                        .keyboardType(.emailAddress)
-                        .textInputAutocapitalization(.never)
-                        .focused($currentFocus, equals: .email)
-                        .padding(13)
-                        .roundedBorder(.separator, width: 0.5, radius: 16)
-                    SecureField("Password", text: $store.password, prompt: Text("パスワード"))
-                        .focused($currentFocus, equals: .password)
-                        .padding(13)
-                        .roundedBorder(.separator, width: 0.5, radius: 16)
-                }
+                    VStack(spacing: 15) {
+                        TextField("Email", text: $store.email, prompt: Text("メールアドレス"))
+                            .keyboardType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                            .focused($currentFocus, equals: .email)
+                            .padding(13)
+                            .roundedBorder(.separator, width: 0.5, radius: 16)
+                        SecureField("Password", text: $store.password, prompt: Text("パスワード"))
+                            .focused($currentFocus, equals: .password)
+                            .padding(13)
+                            .roundedBorder(.separator, width: 0.5, radius: 16)
+                    }
 
-                LargeButton {
-                    store.send(.onTapSignUpButton)
-                } label: {
-                    if store.signingUp {
-                        ProgressView()
-                    } else {
-                        Text("アカウント作成")
+                    LargeButton {
+                        store.send(.onTapSignUpButton)
+                    } label: {
+                        if store.signingUp {
+                            ProgressView()
+                        } else {
+                            Text("アカウント作成")
+                        }
                     }
                 }
+                .padding(.horizontal, 24)
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 52)
-
             Spacer()
         }
         .disabled(store.signingUp)
