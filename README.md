@@ -37,6 +37,8 @@
   - バージョン管理戦略（ブランチ戦略）、Issueトラッキング、Pull Requestの運用フロー、コードレビュープロセス、テスト戦略など、日々の開発の進め方に関する規約を定めます。
 - [`docs/07_AI_AGENT_CODING_GUIDELINES.md`](./docs/07_AI_AGENT_CODING_GUIDELINES.md): **AIエージェント利用ガイドライン**
   - AI開発エージェントへの指示の出し方、期待する成果物の形式、レビューのポイント、AIの学習バージョン管理など、AIとの協調作業を円滑に進めるための具体的な指針を記述します。
+- [`docs/08_SCREEN_SPECIFICATIONS.md`](./docs/08_SCREEN_SPECIFICATIONS.md): **画面仕様書**
+  - アプリの各画面の仕様や画面間の遷移、主要なUI要素、関連する機能モジュールなどを定義します。UI実装の基礎となるドキュメントです。
 
 ## 4. セットアップ方法 (Setup Instructions)
 
