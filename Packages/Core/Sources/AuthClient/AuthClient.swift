@@ -11,17 +11,23 @@ public struct AuthClient: Sendable {
     public var login: @Sendable (EMail, String) async throws -> Entity.User.ID
     public var signUp: @Sendable (EMail, String) async throws -> Entity.User.ID
     public var signOut: @Sendable () throws -> Void
+    public var appleSignIn: @Sendable () async throws -> Entity.User.ID
+    public var sendPasswordResetEmail: @Sendable (EMail) async throws -> Void
 
     public init(
         autoLogin: @escaping @Sendable () -> Entity.User.ID?,
         login: @escaping @Sendable (EMail, String) async throws -> Entity.User.ID,
         signUp: @escaping @Sendable (EMail, String) async throws -> Entity.User.ID,
-        signOut: @escaping @Sendable () throws -> Void
+        signOut: @escaping @Sendable () throws -> Void,
+        appleSignIn: @escaping @Sendable () async throws -> Entity.User.ID,
+        sendPasswordResetEmail: @escaping @Sendable (EMail) async throws -> Void
     ) {
         self.autoLogin = autoLogin
         self.login = login
         self.signUp = signUp
         self.signOut = signOut
+        self.appleSignIn = appleSignIn
+        self.sendPasswordResetEmail = sendPasswordResetEmail
     }
 }
 
@@ -56,6 +62,21 @@ extension AuthClient: DependencyKey {
                 } catch {
                     throw AuthError(from: error)
                 }
+            },
+            appleSignIn: { @MainActor in
+                do {
+                    let result = try await AppleSignInManager().handleSignInWithApple()
+                    return Entity.User.ID(rawValue: result.user.uid)
+                } catch {
+                    throw AuthError(from: error)
+                }
+            },
+            sendPasswordResetEmail: { email in
+                do {
+                    try await Auth.auth().sendPasswordReset(withEmail: email.rawValue)
+                } catch {
+                    throw AuthError(from: error)
+                }
             }
         )
     }
@@ -74,6 +95,12 @@ extension AuthClient: DependencyKey {
                 return "user-id"
             },
             signOut: {
+                // Do nothing
+            },
+            appleSignIn: {
+                "user-id"
+            },
+            sendPasswordResetEmail: { _ in
                 // Do nothing
             }
         )

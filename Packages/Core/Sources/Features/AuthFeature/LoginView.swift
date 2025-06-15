@@ -22,46 +22,8 @@ public struct LoginView: View {
                 ScrollView {
                     VStack(spacing: 35) {
                         header
-
-                        VStack(spacing: 15) {
-                            TextField("Email", text: $store.email, prompt: Text("メールアドレス"))
-                                .keyboardType(.emailAddress)
-                                .textInputAutocapitalization(.never)
-                                .disableAutocorrection(true)
-                                .focused($currentFocus, equals: .email)
-                                .padding(13)
-                                .roundedBorder(.separator, width: 0.5, radius: 16)
-                            SecureField("Password", text: $store.password, prompt: Text("パスワード"))
-                                .focused($currentFocus, equals: .password)
-                                .padding(13)
-                                .roundedBorder(.separator, width: 0.5, radius: 16)
-                            HStack {
-                                Spacer()
-                                Button(action: {}) {
-                                    Text("パスワードをお忘れの方")
-                                        .font(.caption)
-                                }
-                            }
-                        }
-
-                        LargeButton {
-                            store.send(.onTapLoginButton)
-                        } label: {
-                            if store.logining {
-                                ProgressView()
-                            } else {
-                                Text("ログイン")
-                            }
-                        }
-
-
-                        Text("または")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-
-                        Button("Google Login") {
-                            // Call Google Login Logic
-                        }
+                        formFields
+                        loginActions
                     }
                     .padding(.horizontal, 24)
                 }
@@ -83,9 +45,10 @@ public struct LoginView: View {
                     }
                 }
             }
-            .disabled(store.logining)
-            .interactiveDismissDisabled(store.logining)
+            .disabled(store.loading)
+            .interactiveDismissDisabled(store.loading)
             .alert($store.scope(state: \.errorAlert, action: \.errorAlert))
+            .alert($store.scope(state: \.alert, action: \.alert))
             .navigationDestination(item: $store.scope(state: \.signUp, action: \.signUp)) { store in
                 SignUpView(store: store)
             }
@@ -103,6 +66,55 @@ extension LoginView {
 
             Text("メールアドレスとパスワードでログイン")
                 .multilineTextAlignment(.center)
+        }
+    }
+
+    var formFields: some View {
+        VStack(spacing: 15) {
+            TextField("Email", text: $store.email, prompt: Text("メールアドレス"))
+                .keyboardType(.emailAddress)
+                .textInputAutocapitalization(.never)
+                .disableAutocorrection(true)
+                .focused($currentFocus, equals: .email)
+                .padding(13)
+                .roundedBorder(.separator, width: 0.5, radius: 16)
+            SecureField("Password", text: $store.password, prompt: Text("パスワード"))
+                .focused($currentFocus, equals: .password)
+                .padding(13)
+                .roundedBorder(.separator, width: 0.5, radius: 16)
+            HStack {
+                Spacer()
+                Button {
+                    store.send(.onTapForgetPasswordButton)
+                } label: {
+                    Text("パスワードをお忘れの方")
+                        .font(.caption)
+                }
+            }
+        }
+    }
+
+    var loginActions: some View {
+        VStack(spacing: 16) {
+            LargeButton {
+                store.send(.onTapLoginButton)
+            } label: {
+                if store.loading {
+                    ProgressView()
+                } else {
+                    Text("ログイン")
+                }
+            }
+
+            Text("または")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            LargeButton(role: .secondary) {
+                store.send(.onTapAppleSignInButton)
+            } label: {
+                Label("Appleでサインイン", systemImage: "apple.logo")
+            }
         }
     }
 }

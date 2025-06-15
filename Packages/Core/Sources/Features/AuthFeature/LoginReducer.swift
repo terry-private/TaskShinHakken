@@ -8,24 +8,29 @@ public struct LoginReducer: Sendable {
     public struct State: Equatable, Sendable {
         var email: String = ""
         var password: String = ""
-        var logining: Bool = false
-        @Presents var errorAlert: AlertState<Action.ErrorAlertAction>?
+        var loading: Bool = false
+        @Presents var errorAlert: AlertState<Action.SimpleAlertAction>?
         @Presents var signUp: SignUpReducer.State?
+        @Presents var alert: AlertState<Action.SimpleAlertAction>?
 
         public init() {}
     }
 
     public enum Action: BindableAction {
-        public enum ErrorAlertAction: Sendable {
+        public enum SimpleAlertAction: Sendable {
             case ok
         }
         case binding(BindingAction<State>)
         case onTapLoginButton
         case loginSucceeded(User.ID)
         case showAlert(any Error)
-        case errorAlert(PresentationAction<ErrorAlertAction>)
+        case showSendPasswordResetEmailSucceededAlert
+        case errorAlert(PresentationAction<SimpleAlertAction>)
+        case alert(PresentationAction<SimpleAlertAction>)
         case onTapSignUpButton
         case signUp(PresentationAction<SignUpReducer.Action>)
+        case onTapAppleSignInButton
+        case onTapForgetPasswordButton
     }
 
     @Dependency(\.authClient) var authClient
@@ -39,9 +44,9 @@ public struct LoginReducer: Sendable {
             case .binding:
                 return .none
             case .onTapLoginButton:
-                state.logining = true
+                state.loading = true
                 guard let email = EMail(rawValue: state.email) else {
-                    state.logining = false
+                    state.loading = false
                     state.errorAlert = AlertState {
                         TextState("メールアドレスが間違っています。")
                     }
@@ -58,11 +63,11 @@ public struct LoginReducer: Sendable {
                 }
 
             case .loginSucceeded:
-                state.logining = false
+                state.loading = false
                 return .none
 
             case .showAlert(let error):
-                state.logining = false
+                state.loading = false
                 if let authError = error as? AuthError {
                     switch authError {
                     case .invalidEmail:
@@ -71,18 +76,27 @@ public struct LoginReducer: Sendable {
                         })
                     default:
                         state.errorAlert = AlertState(title: {
-                            TextState("ログインに失敗しました")
+                            TextState("ログインに失敗しました。")
                         })
                     }
                 } else {
                     state.errorAlert = AlertState(title: {
-                        TextState("ログインに失敗しました")
+                        TextState("ログインに失敗しました。")
                     })
                 }
 
                 return .none
+            case .showSendPasswordResetEmailSucceededAlert:
+                state.loading = false
+                state.alert = AlertState(title: {
+                    TextState("パスワード再設定メールを送りました。")
+                })
+                return .none
             case .errorAlert:
                 state.errorAlert = nil
+                return .none
+            case .alert:
+                state.alert = nil
                 return .none
 
             case .onTapSignUpButton:
@@ -90,11 +104,38 @@ public struct LoginReducer: Sendable {
                 return .none
             case .signUp:
                 return .none
+            case .onTapAppleSignInButton:
+                return .run { send in
+                    do {
+                        let userID = try await authClient.appleSignIn()
+                        await send(.loginSucceeded(userID))
+                    } catch {
+                        await send(.showAlert(error))
+                    }
+                }
+            case .onTapForgetPasswordButton:
+                guard let email = EMail(rawValue: state.email) else {
+                    state.loading = false
+                    state.errorAlert = AlertState {
+                        TextState("メールアドレスが間違っています。")
+                    }
+                    return .none
+                }
+                return .run { send in
+                    do {
+                        try await authClient.sendPasswordResetEmail(email)
+                        await send(.showSendPasswordResetEmailSucceededAlert)
+                    } catch {
+                        await send(.showAlert(error))
+                    }
+                }
             }
         }
         .ifLet(\.errorAlert, action: \.errorAlert)
+        .ifLet(\.alert, action: \.alert)
         .ifLet(\.$signUp, action: \.signUp) {
             SignUpReducer()
         }
     }
 }
+
