@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,17 +6,27 @@ import PackageDescription
 let package = Package(
     name: "Core",
     platforms: [
-        .iOS("18.0"),
-        .macOS("10.15")
+        .iOS("26.0"),
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "CoreClient",
-            targets: ["CoreClient"]),
+            name: "AuthClient",
+            targets: ["AuthClient"]),
+
         .library(
             name: "Entity",
             targets: ["Entity"]),
+
+        .library(
+            name: "UIComponents",
+            targets: ["UIComponents"]),
+
+        // MARK: - Features
+
+        .library(
+            name: "AuthFeature",
+            targets: ["AuthFeature"]),
         .library(
             name: "HomeFeature",
             targets: ["HomeFeature"]),
@@ -32,25 +42,48 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.20.2"),
+        .package(url: "https://github.com/pointfreeco/swift-navigation", from: "2.3.1"),
+        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "11.14.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "CoreClient",
+            name: "AuthClient",
             dependencies: [
                 "Entity",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-            ],
-            path: "./Sources/CoreClient"
+                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
+            ]
         ),
+
         .target(
             name: "Entity"
         ),
+
+        .target(
+            name: "UIComponents"
+        ),
+
+        // MARK: - Features
+
+        .target(
+            name: "AuthFeature",
+            dependencies: [
+                "AuthClient",
+                "Entity",
+                "UIComponents",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ],
+            path: "./Sources/Features/AuthFeature"
+        ),
+
         .target(
             name: "HomeFeature",
             dependencies: [
                 "Entity",
+                "UIComponents",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
             path: "./Sources/Features/HomeFeature"
@@ -59,10 +92,11 @@ let package = Package(
             name: "ProductAppFeature",
             dependencies: [
                 "Entity",
-                "TaskFeature",
+                "AuthFeature",
                 "HomeFeature",
+                "TaskFeature",
                 "SettingsFeature",
-                "CoreClient",
+                "UIComponents",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
             path: "./Sources/Features/ProductAppFeature"
@@ -70,7 +104,9 @@ let package = Package(
         .target(
             name: "SettingsFeature",
             dependencies: [
+                "AuthClient",
                 "Entity",
+                "UIComponents",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
             path: "./Sources/Features/SettingsFeature"
@@ -79,6 +115,7 @@ let package = Package(
             name: "TaskFeature",
             dependencies: [
                 "Entity",
+                "UIComponents",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
             path: "./Sources/Features/TaskFeature"

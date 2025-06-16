@@ -1,22 +1,26 @@
-import AuthClient
 import ComposableArchitecture
-import SwiftUI
+import AuthClient
+import Entity
 
 @Reducer
-public struct SettingsReducer: Sendable {
+public struct SignUpReducer: Sendable {
     @ObservableState
-    public struct State: Equatable {
-        var signingOut: Bool = false
+    public struct State: Equatable, Sendable {
+        var email: String = ""
+        var password: String = ""
+        var signingUp: Bool = false
         @Presents var errorAlert: AlertState<Action.ErrorAlertAction>?
+
         public init() {}
     }
 
-    public enum Action {
+    public enum Action: BindableAction {
         public enum ErrorAlertAction: Sendable {
             case ok
         }
-        case onTapLogoutButton
-        case logout
+        case binding(BindingAction<State>)
+        case onTapSignUpButton
+        case signUpSucceeded(User.ID)
         case showAlert(any Error)
         case errorAlert(PresentationAction<ErrorAlertAction>)
     }
@@ -26,23 +30,36 @@ public struct SettingsReducer: Sendable {
     public init() {}
 
     public var body: some ReducerOf<Self> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
-            case .onTapLogoutButton:
-                state.signingOut = true
+            case .binding:
+                return .none
+            case .onTapSignUpButton:
+                state.signingUp = true
+                guard let email = EMail(rawValue: state.email) else {
+                    state.signingUp = false
+                    state.errorAlert = AlertState {
+                        TextState("メールアドレスが間違っています。")
+                    }
+                    return .none
+                }
+                let password = state.password
                 return .run { send in
                     do {
-                        try self.authClient.signOut()
-                        await send(.logout)
+                        let userID = try await self.authClient.signUp(email, password)
+                        await send(.signUpSucceeded(userID))
                     } catch {
                         await send(.showAlert(error))
                     }
                 }
-            case .logout:
-                state.signingOut = false
+
+            case .signUpSucceeded:
+                state.signingUp = false
                 return .none
+
             case .showAlert(let error):
-                state.signingOut = false
+                state.signingUp = false
                 if let authError = error as? AuthError {
                     switch authError {
                     case .invalidEmail:
@@ -66,5 +83,6 @@ public struct SettingsReducer: Sendable {
                 return .none
             }
         }
+        .ifLet(\.errorAlert, action: \.errorAlert)
     }
-} 
+}

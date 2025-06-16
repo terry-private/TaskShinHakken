@@ -1,5 +1,6 @@
+import AuthFeature
 import ComposableArchitecture
-import CoreClient
+import AuthClient
 import Entity
 import HomeFeature
 import SettingsFeature
@@ -12,32 +13,44 @@ public struct ProductAppReducer: Sendable {
     public struct State: Equatable {
         var mainTab: MainTabReducer.State?
         var loading: Bool = false
+        @Presents var login: LoginReducer.State?
         public init() {}
     }
 
     public enum Action {
         case mainTab(MainTabReducer.Action)
-        case login
-        case loginSuceeded(User.ID)
+        case login(PresentationAction<LoginReducer.Action>)
+        case loginButtonTapped
+        case autoLogin
     }
 
-    @Dependency(\.loginClient) var loginClient
+    @Dependency(\.authClient) var authClient
 
     public init() {}
 
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .login:
-                state.loading = true
-                return .run { send in
-                    if let userID = try? await loginClient.login() {
-                        await send(.loginSuceeded(userID))
-                    }
+            case .autoLogin:
+                if let userID = authClient.autoLogin() {
+                    state.mainTab = .init(userID: userID)
                 }
-            case let .loginSuceeded(userID):
+                return .none
+            case .loginButtonTapped:
+                state.login = LoginReducer.State()
+                return .none
+            case .login(.presented(.loginSucceeded(let userID))):
+                state.login = nil
                 state.mainTab = .init(userID: userID)
-                state.loading = false
+                return .none
+            case .login(.presented(.signUp(.presented(.signUpSucceeded(let userID))))):
+                state.login = nil
+                state.mainTab = .init(userID: userID)
+                return .none
+            case .login:
+                return .none
+            case .mainTab(.settings(.logout)):
+                state.mainTab = nil
                 return .none
             case .mainTab:
                 return .none
@@ -45,6 +58,9 @@ public struct ProductAppReducer: Sendable {
         }
         .ifLet(\.mainTab, action: \.mainTab) {
             MainTabReducer()
+        }
+        .ifLet(\.$login, action: \.login) {
+            LoginReducer()
         }
     }
 }

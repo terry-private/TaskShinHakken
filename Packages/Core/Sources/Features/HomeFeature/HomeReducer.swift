@@ -1,5 +1,4 @@
 import ComposableArchitecture
-import SwiftUI
 
 @Reducer
 public struct HomeReducer {
@@ -17,4 +16,4 @@ public struct HomeReducer {
             .none
         }
     }
-} 
+}

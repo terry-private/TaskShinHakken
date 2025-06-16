@@ -1,4 +1,5 @@
 import SwiftUI
+import AuthClient
 import ComposableArchitecture
 
 public struct RootView: View {
