@@ -9,6 +9,55 @@
     }
   ],
   "defaultOptions" : {
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:..\/Packages\/Core",
+          "identifier" : "AuthClient",
+          "name" : "AuthClient"
+        },
+        {
+          "containerPath" : "container:..\/Packages\/Core",
+          "identifier" : "AuthFeature",
+          "name" : "AuthFeature"
+        },
+        {
+          "containerPath" : "container:..\/Packages\/Core",
+          "identifier" : "Entity",
+          "name" : "Entity"
+        },
+        {
+          "containerPath" : "container:..\/Packages\/Core",
+          "identifier" : "HomeFeature",
+          "name" : "HomeFeature"
+        },
+        {
+          "containerPath" : "container:..\/Packages\/Core",
+          "identifier" : "ProductAppFeature",
+          "name" : "ProductAppFeature"
+        },
+        {
+          "containerPath" : "container:..\/Packages\/Core",
+          "identifier" : "SettingsFeature",
+          "name" : "SettingsFeature"
+        },
+        {
+          "containerPath" : "container:..\/Packages\/Core",
+          "identifier" : "TaskFeature",
+          "name" : "TaskFeature"
+        },
+        {
+          "containerPath" : "container:..\/Packages\/Core",
+          "identifier" : "UIComponents",
+          "name" : "UIComponents"
+        },
+        {
+          "containerPath" : "container:..\/Packages\/Core",
+          "identifier" : "EntityTests",
+          "name" : "EntityTests"
+        }
+      ]
+    },
     "testTimeoutsEnabled" : true
   },
   "testTargets" : [
