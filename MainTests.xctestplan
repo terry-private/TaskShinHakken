@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "98733F41-E0B6-46D4-9BFB-5790D8F6A2C7",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:..\/Packages\/Core",
+        "identifier" : "EntityTests",
+        "name" : "EntityTests"
+      }
+    }
+  ],
+  "version" : 1
+}
