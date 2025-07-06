@@ -1,6 +1,7 @@
 import AuthFeature
 import ComposableArchitecture
 import AuthClient
+import UserClient
 import Entity
 import MainTabFeature
 import SwiftUI
@@ -11,6 +12,7 @@ public struct ProductAppReducer: Sendable {
     public struct State: Equatable {
         var mainTab: MainTabReducer.State?
         var loading: Bool = false
+        var checkingSetupStatus: Bool = false
         @Presents var login: LoginReducer.State?
         public init() {}
     }
@@ -20,9 +22,12 @@ public struct ProductAppReducer: Sendable {
         case login(PresentationAction<LoginReducer.Action>)
         case loginButtonTapped
         case autoLogin
+        case checkSetupStatus(Entity.User.ID)
+        case setupStatusReceived(Bool, Entity.User.ID)
     }
 
     @Dependency(\.authClient) var authClient
+    @Dependency(\.userClient) var userClient
 
     public init() {}
 
@@ -31,7 +36,9 @@ public struct ProductAppReducer: Sendable {
             switch action {
             case .autoLogin:
                 if let userID = authClient.autoLogin() {
-                    state.mainTab = .init(userID: userID)
+                    return .run { send in
+                        await send(.checkSetupStatus(userID))
+                    }
                 }
                 return .none
             case .loginButtonTapped:
@@ -39,11 +46,36 @@ public struct ProductAppReducer: Sendable {
                 return .none
             case .login(.presented(.loginSucceeded(let userID))):
                 state.login = nil
-                state.mainTab = .init(userID: userID)
-                return .none
+                return .run { send in
+                    await send(.checkSetupStatus(userID))
+                }
             case .login(.presented(.signUp(.presented(.signUpSucceeded(let userID))))):
                 state.login = nil
-                state.mainTab = .init(userID: userID)
+                return .run { send in
+                    await send(.checkSetupStatus(userID))
+                }
+            case .checkSetupStatus(let userID):
+                state.checkingSetupStatus = true
+                return .run { send in
+                    do {
+                        let isSetupCompleted = try await userClient.getUserSetupStatus(userID)
+                        await send(.setupStatusReceived(isSetupCompleted, userID))
+                    } catch {
+                        // エラー時は一旦セットアップ完了とみなしてMainTabへ遷移
+                        await send(.setupStatusReceived(true, userID))
+                    }
+                }
+            case .setupStatusReceived(let isSetupCompleted, let userID):
+                state.checkingSetupStatus = false
+                
+                if isSetupCompleted {
+                    // セットアップ完了済みの場合はMainTabへ遷移
+                    state.mainTab = .init(userID: userID)
+                } else {
+                    // 未セットアップの場合は将来的にSetupFeatureへ遷移
+                    // TODO: SetupFeature実装後に変更
+                    state.mainTab = .init(userID: userID)
+                }
                 return .none
             case .login:
                 return .none

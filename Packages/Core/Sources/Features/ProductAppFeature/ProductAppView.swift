@@ -19,8 +19,14 @@ public struct ProductAppView: View {
                     .opacity(0.3)
                     .ignoresSafeArea()
                     .overlay {
-                        if store.loading {
-                            ProgressView()
+                        if store.loading || store.checkingSetupStatus {
+                            VStack {
+                                ProgressView()
+                                Text(store.checkingSetupStatus ? "セットアップ状態を確認中..." : "読み込み中...")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .padding(.top, 8)
+                            }
                         } else {
                             Button("ログイン") {
                                 store.send(.loginButtonTapped)

@@ -7,12 +7,17 @@ let package = Package(
     name: "Core",
     platforms: [
         .iOS("26.0"),
+        .macOS("10.15"),
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "AuthClient",
             targets: ["AuthClient"]),
+
+        .library(
+            name: "UserClient",
+            targets: ["UserClient"]),
 
         .library(
             name: "Entity",
@@ -58,6 +63,15 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
+            ]
+        ),
+
+        .target(
+            name: "UserClient",
+            dependencies: [
+                "Entity",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
             ]
         ),
 
@@ -109,6 +123,7 @@ let package = Package(
                 "Entity",
                 "AuthFeature",
                 "MainTabFeature",
+                "UserClient",
                 "UIComponents",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],
