@@ -31,6 +31,9 @@ let package = Package(
             name: "HomeFeature",
             targets: ["HomeFeature"]),
         .library(
+            name: "MainTabFeature",
+            targets: ["MainTabFeature"]),
+        .library(
             name: "ProductAppFeature",
             targets: ["ProductAppFeature"]),
         .library(
@@ -89,13 +92,23 @@ let package = Package(
             path: "./Sources/Features/HomeFeature"
         ),
         .target(
+            name: "MainTabFeature",
+            dependencies: [
+                "Entity",
+                "HomeFeature",
+                "TaskFeature",
+                "SettingsFeature",
+                "UIComponents",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ],
+            path: "./Sources/Features/MainTabFeature"
+        ),
+        .target(
             name: "ProductAppFeature",
             dependencies: [
                 "Entity",
                 "AuthFeature",
-                "HomeFeature",
-                "TaskFeature",
-                "SettingsFeature",
+                "MainTabFeature",
                 "UIComponents",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],

@@ -2,10 +2,8 @@ import AuthFeature
 import ComposableArchitecture
 import AuthClient
 import Entity
-import HomeFeature
-import SettingsFeature
+import MainTabFeature
 import SwiftUI
-import TaskFeature
 
 @Reducer
 public struct ProductAppReducer: Sendable {
