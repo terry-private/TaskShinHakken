@@ -1,9 +1,7 @@
 import AuthFeature
 import ComposableArchitecture
+import MainTabFeature
 import SwiftUI
-import HomeFeature
-import SettingsFeature
-import TaskFeature
 
 public struct ProductAppView: View {
     @Bindable var store: StoreOf<ProductAppReducer>
