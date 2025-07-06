@@ -1,3 +1,5 @@
+import Foundation
+
 public struct User: Sendable, Identifiable {
     public struct ID: Sendable, Hashable, Codable, RawRepresentable, ExpressibleByStringLiteral {
         public let rawValue: String
@@ -10,9 +12,13 @@ public struct User: Sendable, Identifiable {
     }
     public var id: ID
     public var name: String
+    public var isSetupCompleted: Bool
+    public var setupCompletedAt: Date?
 
-    public init(id: ID, name: String) {
+    public init(id: ID, name: String, isSetupCompleted: Bool = false, setupCompletedAt: Date? = nil) {
         self.id = id
         self.name = name
+        self.isSetupCompleted = isSetupCompleted
+        self.setupCompletedAt = setupCompletedAt
     }
 }

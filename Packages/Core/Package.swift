@@ -7,6 +7,7 @@ let package = Package(
     name: "Core",
     platforms: [
         .iOS("26.0"),
+        .macOS("10.15"),
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
@@ -58,6 +59,7 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
             ]
         ),
 
