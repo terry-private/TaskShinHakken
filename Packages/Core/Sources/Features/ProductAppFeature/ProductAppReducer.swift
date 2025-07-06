@@ -1,6 +1,7 @@
 import AuthFeature
 import ComposableArchitecture
 import AuthClient
+import UserClient
 import Entity
 import MainTabFeature
 import SwiftUI
@@ -26,6 +27,7 @@ public struct ProductAppReducer: Sendable {
     }
 
     @Dependency(\.authClient) var authClient
+    @Dependency(\.userClient) var userClient
 
     public init() {}
 
@@ -56,7 +58,7 @@ public struct ProductAppReducer: Sendable {
                 state.checkingSetupStatus = true
                 return .run { send in
                     do {
-                        let isSetupCompleted = try await authClient.getUserSetupStatus(userID)
+                        let isSetupCompleted = try await userClient.getUserSetupStatus(userID)
                         await send(.setupStatusReceived(isSetupCompleted, userID))
                     } catch {
                         // エラー時は一旦セットアップ完了とみなしてMainTabへ遷移

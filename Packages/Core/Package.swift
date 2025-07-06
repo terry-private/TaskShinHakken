@@ -16,6 +16,10 @@ let package = Package(
             targets: ["AuthClient"]),
 
         .library(
+            name: "UserClient",
+            targets: ["UserClient"]),
+
+        .library(
             name: "Entity",
             targets: ["Entity"]),
 
@@ -59,6 +63,14 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
+            ]
+        ),
+
+        .target(
+            name: "UserClient",
+            dependencies: [
+                "Entity",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
             ]
         ),
@@ -111,6 +123,7 @@ let package = Package(
                 "Entity",
                 "AuthFeature",
                 "MainTabFeature",
+                "UserClient",
                 "UIComponents",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ],

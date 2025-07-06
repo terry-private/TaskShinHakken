@@ -2,7 +2,6 @@ import ComposableArchitecture
 import Entity
 import FirebaseAuth
 import FirebaseCore
-import FirebaseFirestore
 
 public struct AuthClient: Sendable {
     public static func configure() {
@@ -14,7 +13,6 @@ public struct AuthClient: Sendable {
     public var signOut: @Sendable () throws -> Void
     public var appleSignIn: @Sendable () async throws -> Entity.User.ID
     public var sendPasswordResetEmail: @Sendable (EMail) async throws -> Void
-    public var getUserSetupStatus: @Sendable (Entity.User.ID) async throws -> Bool
 
     public init(
         autoLogin: @escaping @Sendable () -> Entity.User.ID?,
@@ -22,8 +20,7 @@ public struct AuthClient: Sendable {
         signUp: @escaping @Sendable (EMail, String) async throws -> Entity.User.ID,
         signOut: @escaping @Sendable () throws -> Void,
         appleSignIn: @escaping @Sendable () async throws -> Entity.User.ID,
-        sendPasswordResetEmail: @escaping @Sendable (EMail) async throws -> Void,
-        getUserSetupStatus: @escaping @Sendable (Entity.User.ID) async throws -> Bool
+        sendPasswordResetEmail: @escaping @Sendable (EMail) async throws -> Void
     ) {
         self.autoLogin = autoLogin
         self.login = login
@@ -31,7 +28,6 @@ public struct AuthClient: Sendable {
         self.signOut = signOut
         self.appleSignIn = appleSignIn
         self.sendPasswordResetEmail = sendPasswordResetEmail
-        self.getUserSetupStatus = getUserSetupStatus
     }
 }
 
@@ -81,23 +77,6 @@ extension AuthClient: DependencyKey {
                 } catch {
                     throw AuthError(from: error)
                 }
-            },
-            getUserSetupStatus: { userID in
-                do {
-                    let db = Firestore.firestore()
-                    let userDoc = try await db.collection("users").document(userID.rawValue).getDocument()
-                    
-                    guard userDoc.exists,
-                          let data = userDoc.data(),
-                          let isSetupCompleted = data["isSetupCompleted"] as? Bool else {
-                        // ユーザードキュメントが存在しない場合は未セットアップとみなす
-                        return false
-                    }
-                    
-                    return isSetupCompleted
-                } catch {
-                    throw AuthError(from: error)
-                }
             }
         )
     }
@@ -123,10 +102,6 @@ extension AuthClient: DependencyKey {
             },
             sendPasswordResetEmail: { _ in
                 // Do nothing
-            },
-            getUserSetupStatus: { _ in
-                try await Task.sleep(for: .seconds(0.5))
-                return false // プレビューでは常に未セットアップ
             }
         )
     }
