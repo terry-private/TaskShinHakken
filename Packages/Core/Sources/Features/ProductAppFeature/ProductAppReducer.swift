@@ -80,6 +80,8 @@ public struct ProductAppReducer: Sendable {
             case .mainTab(.settings(.logout)):
                 state.mainTab = nil
                 return .none
+            case .mainTab:
+                return .none
             }
         }
         .ifLet(\.mainTab, action: \.mainTab) {
